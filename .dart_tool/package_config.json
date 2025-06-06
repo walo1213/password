@@ -305,7 +305,7 @@
       "name": "password_manager",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.2"
     }
   ],
   "generator": "pub",

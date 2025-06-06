@@ -1,4 +1,4 @@
-// @dart=3.8
+// @dart=3.2
 // Flutter web bootstrap script for package:password_manager/main.dart.
 //
 // Generated file. Do not edit.
