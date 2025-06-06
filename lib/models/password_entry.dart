@@ -3,8 +3,9 @@ class PasswordEntry {
   final String intitule;
   final String identifiant;
   final String motDePasse;
-  final String type; // 'compte', 'banque', 'autre'
-  final String note;
+  final String type;
+  final String? note;
+  final int? categoryId; // Nouveau champ
   final DateTime dateCreation;
   final DateTime dateModification;
 
@@ -14,7 +15,8 @@ class PasswordEntry {
     required this.identifiant,
     required this.motDePasse,
     required this.type,
-    required this.note,
+    this.note,
+    this.categoryId, // Nouveau champ
     required this.dateCreation,
     required this.dateModification,
   });
@@ -27,8 +29,9 @@ class PasswordEntry {
       'motDePasse': motDePasse,
       'type': type,
       'note': note,
-      'dateCreation': dateCreation.millisecondsSinceEpoch,
-      'dateModification': dateModification.millisecondsSinceEpoch,
+      'categoryId': categoryId, // Nouveau champ
+      'dateCreation': dateCreation.toIso8601String(),
+      'dateModification': dateModification.toIso8601String(),
     };
   }
 
@@ -38,10 +41,11 @@ class PasswordEntry {
       intitule: map['intitule'] ?? '',
       identifiant: map['identifiant'] ?? '',
       motDePasse: map['motDePasse'] ?? '',
-      type: map['type'] ?? 'autre',
-      note: map['note'] ?? '',
-      dateCreation: DateTime.fromMillisecondsSinceEpoch(map['dateCreation']),
-      dateModification: DateTime.fromMillisecondsSinceEpoch(map['dateModification']),
+      type: map['type'] ?? '',
+      note: map['note'],
+      categoryId: map['categoryId'], // Nouveau champ
+      dateCreation: DateTime.parse(map['dateCreation']),
+      dateModification: DateTime.parse(map['dateModification']),
     );
   }
 
@@ -52,6 +56,7 @@ class PasswordEntry {
     String? motDePasse,
     String? type,
     String? note,
+    int? categoryId, // Nouveau champ
     DateTime? dateCreation,
     DateTime? dateModification,
   }) {
@@ -62,6 +67,7 @@ class PasswordEntry {
       motDePasse: motDePasse ?? this.motDePasse,
       type: type ?? this.type,
       note: note ?? this.note,
+      categoryId: categoryId ?? this.categoryId, // Nouveau champ
       dateCreation: dateCreation ?? this.dateCreation,
       dateModification: dateModification ?? this.dateModification,
     );

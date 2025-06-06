@@ -32,6 +32,7 @@ class DatabaseService {
       motDePasse: entry.motDePasse,
       type: entry.type,
       note: entry.note,
+      categoryId: entry.categoryId, // Nouveau champ
       dateCreation: entry.dateCreation,
       dateModification: entry.dateModification,
     );
@@ -52,6 +53,11 @@ class DatabaseService {
     final passwords = await getAllPasswords();
     passwords.removeWhere((p) => p.id == id);
     await _savePasswords(passwords);
+  }
+
+  Future<List<PasswordEntry>> getPasswordsByCategory(int categoryId) async {
+    final passwords = await getAllPasswords();
+    return passwords.where((p) => p.categoryId == categoryId).toList();
   }
 
   Future<List<PasswordEntry>> searchPasswords(String query) async {

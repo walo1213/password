@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/password_entry.dart';
+import '../models/category.dart';
 import '../services/database_service.dart';
+import '../services/category_service.dart';
 
 class AddEditScreen extends StatefulWidget {
   final PasswordEntry? entry;
@@ -14,6 +16,7 @@ class AddEditScreen extends StatefulWidget {
 class _AddEditScreenState extends State<AddEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final DatabaseService _databaseService = DatabaseService();
+  final CategoryService _categoryService = CategoryService();
   
   late TextEditingController _intituleController;
   late TextEditingController _identifiantController;
@@ -21,6 +24,8 @@ class _AddEditScreenState extends State<AddEditScreen> {
   late TextEditingController _noteController;
   
   String _selectedType = 'compte';
+  int? _selectedCategoryId; // Nouveau champ
+  List<Category> _categories = []; // Nouveau champ
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -32,6 +37,19 @@ class _AddEditScreenState extends State<AddEditScreen> {
     _motDePasseController = TextEditingController(text: widget.entry?.motDePasse ?? '');
     _noteController = TextEditingController(text: widget.entry?.note ?? '');
     _selectedType = widget.entry?.type ?? 'compte';
+    _selectedCategoryId = widget.entry?.categoryId; // Nouveau champ
+    _loadCategories(); // Nouveau
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final categories = await _categoryService.getAllCategories();
+      setState(() {
+        _categories = categories;
+      });
+    } catch (e) {
+      // Gérer l'erreur silencieusement
+    }
   }
 
   @override
@@ -49,16 +67,16 @@ class _AddEditScreenState extends State<AddEditScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final now = DateTime.now();
       final entry = PasswordEntry(
         id: widget.entry?.id,
         intitule: _intituleController.text.trim(),
         identifiant: _identifiantController.text.trim(),
         motDePasse: _motDePasseController.text,
         type: _selectedType,
-        note: _noteController.text.trim(),
-        dateCreation: widget.entry?.dateCreation ?? now,
-        dateModification: now,
+        note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+        categoryId: _selectedCategoryId, // Nouveau champ
+        dateCreation: widget.entry?.dateCreation ?? DateTime.now(),
+        dateModification: DateTime.now(),
       );
 
       if (widget.entry == null) {
@@ -70,10 +88,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur lors de la sauvegarde: $e'),
-          backgroundColor: Colors.red[400],
-        ),
+        SnackBar(content: Text('Erreur lors de la sauvegarde')),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -83,30 +98,10 @@ class _AddEditScreenState extends State<AddEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(
-          widget.entry == null ? 'Nouveau mot de passe' : 'Modifier',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.grey[700]),
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : _saveEntry,
-            child: Text(
-              'Sauvegarder',
-              style: TextStyle(
-                color: _isLoading ? Colors.grey : Colors.blue[600],
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+        title: Text(widget.entry == null ? 'Nouveau mot de passe' : 'Modifier le mot de passe'),
+        backgroundColor: Colors.blue[700],
+        foregroundColor: Colors.white,
       ),
       body: Form(
         key: _formKey,
@@ -187,6 +182,58 @@ class _AddEditScreenState extends State<AddEditScreen> {
               ),
             ),
             SizedBox(height: 20),
+            
+            // Nouveau champ pour la catégorie
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Catégorie',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    DropdownButtonFormField<int>(
+                      value: _selectedCategoryId,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Sélectionner une catégorie (optionnel)',
+                      ),
+                      items: [
+                        DropdownMenuItem<int>(
+                          value: null,
+                          child: Text('Aucune catégorie'),
+                        ),
+                        ..._categories.map((category) => DropdownMenuItem<int>(
+                          value: category.id,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: Color(int.parse(category.couleur.replaceFirst('#', '0xFF'))),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(category.nom),
+                            ],
+                          ),
+                        )).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategoryId = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
             
             // Bouton de sauvegarde
             ElevatedButton(
