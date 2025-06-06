@@ -24,7 +24,7 @@ class ExportService {
         content.writeln('Type: ${entry.type}');
         content.writeln('Identifiant: ${entry.identifiant}');
         content.writeln('Mot de passe: ${entry.motDePasse}');
-        if (entry.note.isNotEmpty) {
+        if (entry.note != null && entry.note!.isNotEmpty) {
           content.writeln('Note: ${entry.note}');
         }
         content.writeln('Date de création: ${entry.dateCreation.toString().split('.')[0]}');
@@ -69,7 +69,7 @@ class ExportService {
       
       // Données
       for (PasswordEntry entry in entries) {
-        String note = entry.note.replaceAll('"', '""');
+        String note = (entry.note ?? '').replaceAll('"', '""');
         String dateCreation = entry.dateCreation.toString().split('.')[0];
         String dateModification = entry.dateModification.toString().split('.')[0];
         content.writeln('"${entry.intitule}","${entry.type}","${entry.identifiant}","${entry.motDePasse}","$note","$dateCreation","$dateModification"');

@@ -158,7 +158,7 @@ class PasswordCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (entry.note != null && entry.note!.isNotEmpty) ..[
+            if (entry.note != null && entry.note!.isNotEmpty) ...[
               SizedBox(height: 8),
               Row(
                 children: [
