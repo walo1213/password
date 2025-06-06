@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/password_entry.dart';
-import '../models/category.dart'; // Import manquant
+import '../models/category.dart';
 
 class PasswordCard extends StatelessWidget {
   final PasswordEntry entry;
-  final Category? category; // Nouveau paramètre
+  final Category? category;
   final VoidCallback onTap;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -13,7 +13,7 @@ class PasswordCard extends StatelessWidget {
   const PasswordCard({
     Key? key,
     required this.entry,
-    this.category, // Nouveau paramètre
+    this.category,
     required this.onTap,
     required this.onEdit,
     required this.onDelete,
@@ -23,236 +23,191 @@ class PasswordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: category != null 
-              ? Color(int.parse(category!.couleur.replaceFirst('#', '0xFF')))
-              : _getTypeColor(entry.type),
-          child: Icon(
-            _getTypeIcon(entry.type),
-            color: Colors.white,
-          ),
-        ),
-        title: Text(
-          entry.intitule,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(entry.identifiant),
-            if (category != null)
-              Text(
-                category!.nom,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(int.parse(category!.couleur.replaceFirst('#', '0xFF'))),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-          ],
-        ),
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // En-tête avec titre et type
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: _getTypeColor().withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      _getTypeIcon(),
-                      color: _getTypeColor(),
-                      size: 20,
-                    ),
+            // En-tête avec titre et type
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: _getTypeColor().withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.entry.intitule,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[800],
-                          ),
+                  child: Icon(
+                    _getTypeIcon(),
+                    color: _getTypeColor(),
+                    size: 20,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entry.intitule,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
                         ),
+                      ),
+                      Text(
+                        entry.type.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _getTypeColor(),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (category != null)
                         Text(
-                          widget.entry.type.toUpperCase(),
+                          category!.nom,
                           style: TextStyle(
                             fontSize: 12,
-                            color: _getTypeColor(),
+                            color: Color(int.parse(category!.couleur.replaceFirst('#', '0xFF'))),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        widget.onEdit();
-                      } else if (value == 'delete') {
-                        widget.onDelete();
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, size: 18, color: Colors.grey[600]),
-                            SizedBox(width: 8),
-                            Text('Modifier'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 18, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text('Supprimer', style: TextStyle(color: Colors.red)),
-                          ],
-                        ),
-                      ),
                     ],
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'edit':
+                        onEdit();
+                        break;
+                      case 'delete':
+                        onDelete();
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit, size: 18),
+                          SizedBox(width: 8),
+                          Text('Modifier'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, size: 18, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Supprimer', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            // Informations du compte
+            Row(
+              children: [
+                Icon(Icons.person, size: 16, color: Colors.grey[600]),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    entry.identifiant,
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.copy, size: 18),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: entry.identifiant));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Identifiant copié')),
+                    );
+                  },
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.lock, size: 16, color: Colors.grey[600]),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '••••••••',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.copy, size: 18),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: entry.motDePasse));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Mot de passe copié')),
+                    );
+                  },
+                ),
+              ],
+            ),
+            if (entry.note != null && entry.note!.isNotEmpty) ..[
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.note, size: 16, color: Colors.grey[600]),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      entry.note!,
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 16),
-              // Identifiant
-              _buildInfoRow(
-                'Identifiant',
-                widget.entry.identifiant,
-                Icons.person,
-                () => _copyToClipboard(widget.entry.identifiant, 'Identifiant'),
-              ),
-              SizedBox(height: 12),
-              // Mot de passe
-              _buildPasswordRow(),
-              // Note (si présente)
-             if (widget.entry.note.isNotEmpty) ...[
-                SizedBox(height: 12),
-                _buildInfoRow(
-                  'Note',
-                  widget.entry.note,
-                  Icons.note,
-                  null,
-                  maxLines: 2,
-                ),
-              ],
-              SizedBox(height: 8),
-              // Date de modification
-              Text(
-                'Modifié le ${_formatDate(widget.entry.dateModification)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                ),
-              ),
             ],
-          ),
+          ],
         ),
-      );
-  }
-
-  Widget _buildInfoRow(
-    String label,
-    String value,
-    IconData icon,
-    VoidCallback? onTap, {
-    int maxLines = 1,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: Colors.grey[600]),
-        SizedBox(width: 8),
-        Text(
-          '$label: ',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[800],
-            ),
-            maxLines: maxLines,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (onTap != null)
-          IconButton(
-            icon: Icon(Icons.copy, size: 16, color: Colors.grey[600]),
-            onPressed: onTap,
-            padding: EdgeInsets.all(4),
-            constraints: BoxConstraints(),
-          ),
-      ],
+      ),
     );
   }
 
-  Widget _buildPasswordRow() {
-    return Row(
-      children: [
-        Icon(Icons.lock, size: 16, color: Colors.grey[600]),
-        SizedBox(width: 8),
-        Text(
-          'Mot de passe: ',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            _isPasswordVisible ? widget.entry.motDePasse : '••••••••',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[800],
-              fontFamily: _isPasswordVisible ? 'monospace' : null,
-            ),
-          ),
-        ),
-        IconButton(
-          icon: Icon(
-            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-            size: 16,
-            color: Colors.grey[600],
-          ),
-          onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-          padding: EdgeInsets.all(4),
-          constraints: BoxConstraints(),
-        ),
-        IconButton(
-          icon: Icon(Icons.copy, size: 16, color: Colors.grey[600]),
-          onPressed: () => _copyToClipboard(widget.entry.motDePasse, 'Mot de passe'),
-          padding: EdgeInsets.all(4),
-          constraints: BoxConstraints(),
-        ),
-      ],
-    );
+  Color _getTypeColor() {
+    switch (entry.type) {
+      case 'compte':
+        return Colors.blue;
+      case 'carte':
+        return Colors.green;
+      case 'wifi':
+        return Colors.orange;
+      case 'application':
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} à ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  IconData _getTypeIcon() {
+    switch (entry.type) {
+      case 'compte':
+        return Icons.account_circle;
+      case 'carte':
+        return Icons.credit_card;
+      case 'wifi':
+        return Icons.wifi;
+      case 'application':
+        return Icons.apps;
+      default:
+        return Icons.lock;
+    }
   }
 }

@@ -218,8 +218,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.all(16),
                         itemCount: _filteredPasswords.length,
                         itemBuilder: (context, index) {
+                          // Dans la méthode ListView.builder, ligne ~221
                           return PasswordCard(
                             entry: _filteredPasswords[index],
+                            category: _categories.firstWhere(
+                              (cat) => cat.id == _filteredPasswords[index].categoryId,
+                              orElse: () => Category(id: 0, nom: '', couleur: '#666666'),
+                            ),
+                            onTap: () => _navigateToAddEdit(_filteredPasswords[index]), // Paramètre manquant
                             onEdit: () => _navigateToAddEdit(_filteredPasswords[index]),
                             onDelete: () => _deletePassword(_filteredPasswords[index]),
                           );
@@ -238,11 +244,6 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 Future<void> _exportPasswords() async {
-  if (_passwords.isEmpty) {
-    _showErrorSnackBar('Aucune donnée à exporter');
-    return;
-  }
-
   showDialog(
     context: context,
     barrierDismissible: false,
