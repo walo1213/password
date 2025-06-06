@@ -240,7 +240,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             entry: _filteredPasswords[index],
                             category: _categories.firstWhere(
                               (cat) => cat.id == _filteredPasswords[index].categoryId,
-                              orElse: () => Category(id: 0, nom: '', couleur: '#666666'),
+                              orElse: () => Category(
+                                id: 0, 
+                                nom: '', 
+                                couleur: '#666666',
+                                dateCreation: DateTime.now(),
+                              ),
                             ),
                             onTap: () => _navigateToAddEdit(_filteredPasswords[index]),
                             onEdit: () => _navigateToAddEdit(_filteredPasswords[index]),
