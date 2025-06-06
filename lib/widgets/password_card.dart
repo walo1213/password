@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/password_entry.dart';
+import '../models/category.dart'; // Import manquant
 
 class PasswordCard extends StatelessWidget {
   final PasswordEntry entry;

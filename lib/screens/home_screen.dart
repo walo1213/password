@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../models/password_entry.dart';
+import '../models/category.dart'; // Import manquant
 import '../services/database_service.dart';
+import '../services/category_service.dart'; // Import manquant
 import '../services/export_service.dart';
 import 'add_edit_screen.dart';
+import 'category_management_screen.dart'; // Import manquant
 import '../widgets/password_card.dart';
 
 class HomeScreen extends StatefulWidget {
